@@ -1,0 +1,20 @@
+{
+  "name": "ss-node-test",
+  "version": "1.0.0",
+  "description": "shadowsocks available tesing tool based on gui-config.json",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/istobran/ss-node-test.git"
+  },
+  "author": "BangZ",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/istobran/ss-node-test/issues"
+  },
+  "homepage": "https://github.com/istobran/ss-node-test#readme"
+}
