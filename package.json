@@ -12,9 +12,14 @@
     "url": "git+https://github.com/istobran/ss-node-test.git"
   },
   "author": "BangZ",
-  "license": "GPLv3",
+  "license": "LGPL-3.0",
   "bugs": {
     "url": "https://github.com/istobran/ss-node-test/issues"
   },
-  "homepage": "https://github.com/istobran/ss-node-test#readme"
+  "homepage": "https://github.com/istobran/ss-node-test#readme",
+  "dependencies": {
+    "cli-table2": "^0.2.0",
+    "jsonfile": "^2.4.0",
+    "tcp-ping": "^0.1.1"
+  }
 }
