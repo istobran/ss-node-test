@@ -1,5 +1,5 @@
 # ss-node-test
-用于快速批量测试 ss 各节点延迟的工具，基于tcpping
+用于快速批量测试 ss 各节点延迟的工具，基于 tcpping
 
 ### 安装
 
@@ -8,7 +8,7 @@
     npm install
 
 ### 使用方法
-将ss的配置文件`gui-config.json`放入当前项目目录下，接着运行
+将 ss 的配置文件 `gui-config.json` 放入当前项目目录下，接着运行
 
 	npm start
 
