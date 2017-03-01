@@ -56,11 +56,11 @@ const resolveIP = (item) => {
       dns.lookup(item.server, (err, addresses, family) => {
         if (typeof addresses === 'undefined') {
           item.ip = "无法解析";
-          reject();
+          // reject("无法解析");
         } else {
           item.ip = addresses;
-          resolve();
         }
+        resolve();
       });
     }
   });
@@ -68,14 +68,16 @@ const resolveIP = (item) => {
 
 const ping = (item) => {
   return new Promise((resolve, reject) => {
-    resolveIP(item).then(() => {    // 解析成功
-      tcpp.ping({ address: item.ip, port: item.server_port, timeout: 500, attempts: 1 }, (err, data) => {
-        // console.log(err, data);
-        out.push([item.server, item.ip, item.server_port, data.avg ? data.avg.toFixed(3) : "无法连接"]);
+    resolveIP(item).then(() => {
+      if (item.ip == "无法解析") {      // 解析失败
+        out.push([item.server, "无法解析", item.server_port, "无法连接"]);
         resolve();
-      });
-    }, () => {      // 解析失败
-      out.push([item.server, "无法解析", item.server_port, "无法连接"]);
+      } else {    // 解析成功
+        tcpp.ping({ address: item.ip, port: item.server_port, timeout: 500, attempts: 1 }, (err, data) => {
+          out.push([item.server, item.ip, item.server_port, data.avg ? data.avg.toFixed(3) : "无法连接"]);
+          resolve();
+        });
+      }
     })
   });
 }
