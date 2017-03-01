@@ -13,22 +13,22 @@
 	npm start
 
 ### 配置文件格式：
-```json
-{
-    "configs":[
-        {
-            "server":"www.example.com",
-            "server_port":"8388",
-            "local_port":"1080",
-            "password":"abcd",
-            "method":"aes-256-cfg",
-            "remarks":"example"
-        }
+
+    {
+        "configs":[
+            {
+                "server":"www.example.com",
+                "server_port":"8388",
+                "local_port":"1080",
+                "password":"abcd",
+                "method":"aes-256-cfg",
+                "remarks":"example"
+            },
+            ...
+        ],
         ...
-    ],
-    ...
-}
-```
+    }
+
 
 ### 使用建议
 - node 版本建议在 v6 以上
