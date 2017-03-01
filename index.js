@@ -10,6 +10,7 @@ const jsonfile = require("jsonfile");
 const tcpp = require('tcp-ping');
 const dns = require('dns');
 const Table = require('cli-table2');
+const Gauge = require("gauge");
 
 // 帮助信息
 const helpMessage = `
@@ -36,17 +37,40 @@ try {
   throw new Error(`'${file_path}' no such file or directory!`);
 }
 
+// 表格数据部分
 const nodeList = config_data.configs;
 const out = new Table({
-  head: ['Hostname', 'Resolves', 'Port', 'Delay'],
+  head: ['Hostname', 'Resolve', 'Port', 'Delay'],
   colWidths: [20, 20, 15]
 });
-var curr_index = 0;
+var curr_index = 1;
+var curr_target = "";
 
+// 进度条部分
+const gt = new Gauge(process.stderr, {    // 进度条对象
+  updateInterval: 50,
+  cleanupOnExit: true
+});
+var progress = 0;   // 进度
+var pulse = setInterval(function () {   // 说明信息更新器
+  gt.pulse(`正在测试服务器 ${curr_target} 的延迟 ${curr_index}/${nodeList.length}`)
+}, 110);
+var prog = setInterval(function () {    // 进度条更新器
+  progress = curr_index / nodeList.length;
+  gt.show(Math.round(progress * 100)+"%", progress)
+  if (progress >= 1) {
+    clearInterval(prog)
+    clearInterval(pulse)
+    gt.disable()
+  }
+}, 100);
+
+// 检查是否为IPv4
 const isIPv4 = (ip) => {
   return /^(?=\d+\.\d+\.\d+\.\d+$)(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.?){4}$/.test(ip);
 }
 
+// 调用DNS解析IP地址
 const resolveIP = (item) => {
   return new Promise((resolve, reject) => {
     if (isIPv4(item.server)) {
@@ -66,8 +90,10 @@ const resolveIP = (item) => {
   });
 }
 
+// 获取延迟
 const ping = (item) => {
   return new Promise((resolve, reject) => {
+    curr_target = item.server;
     resolveIP(item).then(() => {
       if (item.ip == "无法解析") {      // 解析失败
         out.push([item.server, "无法解析", item.server_port, "无法连接"]);
@@ -82,23 +108,25 @@ const ping = (item) => {
   });
 }
 
+// 主入口
 const main = () => {
     // 返回promise对象的函数的数组
     var tasks = [];
     nodeList.forEach((item) => {
-      tasks.push(() => { return ping(item) });
+      tasks.push(() => { return ping(item).then(() => {curr_index++}) });
     });
     var promise = Promise.resolve();
     // 开始的地方
     tasks.forEach(fn => {
       promise = promise.then(fn);
     });
+    gt.show();
     return promise;
 }
 
 // 运行主程序
 main().then(function (value) {
-    console.log(out.toString());
+  console.log(out.toString());
 }).catch(function(error){
     console.error(error);
 });
