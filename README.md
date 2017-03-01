@@ -21,7 +21,7 @@
                 "server_port":"8388",
                 "local_port":"1080",
                 "password":"abcd",
-                "method":"aes-256-cfg",
+                "method":"aes-256-cfb",
                 "remarks":"example"
             },
             ...
