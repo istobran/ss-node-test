@@ -38,104 +38,63 @@ try {
 
 const nodeList = config_data.configs;
 const out = new Table({
-  head: ['Domain', 'Resolves', 'Delay'],
+  head: ['Hostname', 'Resolves', 'Port', 'Delay'],
   colWidths: [20, 20, 15]
 });
 var curr_index = 0;
 
-const ping = function(item) {
+const isIPv4 = (ip) => {
+  return /^(?=\d+\.\d+\.\d+\.\d+$)(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.?){4}$/.test(ip);
+}
+
+const resolveIP = (item) => {
   return new Promise((resolve, reject) => {
-    console.log("开始执行", Date.now());
-    tcpp.ping({ address: item.server, port: item.server_port, timeout: 500, attempts: 5 }, (err, data) => {
-      console.log(err, data);
-      out.push([data.address, "0.0.0.0", data.avg ? data.avg.toFixed(3) : "无法连接"]);
-      // console.log("chain: ", data.address, " : ", data.avg);
+    if (isIPv4(item.server)) {
+      item.ip = item.server;
       resolve();
-    });
+    } else {
+      dns.lookup(item.server, (err, addresses, family) => {
+        if (typeof addresses === 'undefined') {
+          item.ip = "无法解析";
+          reject();
+        } else {
+          item.ip = addresses;
+          resolve();
+        }
+      });
+    }
   });
 }
 
-// const cb_ping = () => {
-//   return ping(nodeList[curr_index]);
-// };
+const ping = (item) => {
+  return new Promise((resolve, reject) => {
+    resolveIP(item).then(() => {    // 解析成功
+      tcpp.ping({ address: item.ip, port: item.server_port, timeout: 500, attempts: 1 }, (err, data) => {
+        // console.log(err, data);
+        out.push([item.server, item.ip, item.server_port, data.avg ? data.avg.toFixed(3) : "无法连接"]);
+        resolve();
+      });
+    }, () => {      // 解析失败
+      out.push([item.server, "无法解析", item.server_port, "无法连接"]);
+    })
+  });
+}
 
-// const executeTask = () => {
-//
-//   var promise = Promise.resolve();
-//   // console.log(promise.constructor);
-//   for (curr_index = 0; curr_index < nodeList.length; curr_index++) {
-//     promise = promise.then(() => {
-//       // return ping(nodeList[curr_index]);
-//       return new Promise((res, rej) => {
-//         console.log("开始执行", Date.now());
-//         tcpp.ping({
-//           address: nodeList[curr_index].server,
-//           port: nodeList[curr_index].server_port,
-//           attempts: 5
-//         }, (err, data) => {
-//           out.push([data.address, "0.0.0.0", data.avg]);
-//           res();
-//         });
-//       });
-//     });
-//   }
-//
-//   // 循环结束表示全部测试完成
-//   return promise.then(() => {
-//     console.log("finished");
-//     console.log(out.toString());
-//   });
-// };
-//
-// executeTask();
-
-// function getURL(URL) {
-//     return new Promise(function (resolve, reject) {
-//         var req = new XMLHttpRequest();
-//         req.open('GET', URL, true);
-//         req.onload = function () {
-//             if (req.status === 200) {
-//                 resolve(req.responseText);
-//             } else {
-//                 reject(new Error(req.statusText));
-//             }
-//         };
-//         req.onerror = function () {
-//             reject(new Error(req.statusText));
-//         };
-//         req.send();
-//     });
-// }
-var request = {
-        comment: function getComment() {
-            return ping(nodeList[0]).then();
-        },
-        people: function getPeople() {
-            return ping(nodeList[1]).then();
-        }
-    };
-function main() {
-    function recordValue(results, value) {
-        results.push(value);
-        return results;
-    }
-    // [] 用来保存初始化值
-    var pushValue = recordValue.bind(null, []);
+const main = () => {
     // 返回promise对象的函数的数组
     var tasks = [];
-    nodeList.forEach(function(item) {
-      tasks.push(function() { return ping(item).then() });
+    nodeList.forEach((item) => {
+      tasks.push(() => { return ping(item) });
     });
-    // var tasks = [request.comment, request.people];
     var promise = Promise.resolve();
     // 开始的地方
-    for (var i = 0; i < tasks.length; i++) {
-        var task = tasks[i];
-        promise = promise.then(task).then(pushValue);
-    }
+    tasks.forEach(fn => {
+      promise = promise.then(fn);
+    });
     return promise;
 }
-// 运行示例
+
+// 运行主程序
 main().then(function (value) {
     console.log(out.toString());
 }).catch(function(error){
