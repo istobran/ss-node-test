@@ -39,6 +39,7 @@ try {
 
 // 表格数据部分
 const nodeList = config_data.configs;
+const pureData = new Array();
 const out = new Table({
   head: ['Hostname', 'Resolve', 'Port', 'Delay'],
   colWidths: [20, 20, 15]
@@ -101,11 +102,29 @@ const ping = (item) => {
       } else {    // 解析成功
         tcpp.ping({ address: item.ip, port: item.server_port, timeout: 500, attempts: 1 }, (err, data) => {
           out.push([item.server, item.ip, item.server_port, data.avg ? data.avg.toFixed(3) : "无法连接"]);
+          pureData.push({
+            hostname: item.server,
+            ipaddr: item.ip,
+            port: item.server_port,
+            delay: data.avg ? data.avg.toFixed(3) : 999
+          });
           resolve();
         });
       }
     })
   });
+}
+
+const min = (data) => {
+  var min = null;
+  data.forEach((item, index) => {
+    if (index === 0) {
+      min = item;
+    } else if (item.delay < min.delay) {
+      min = item;
+    }
+  });
+  return min;
 }
 
 // 主入口
@@ -127,6 +146,8 @@ const main = () => {
 // 运行主程序
 main().then(function (value) {
   console.log(out.toString());
+  const fastest = min(pureData);
+  console.log(`统计：共计 ${nodeList.length} 个节点，其中最快节点的是 ${fastest.hostname}(${fastest.delay})`);
 }).catch(function(error){
-    console.error(error);
+  console.error(error);
 });
