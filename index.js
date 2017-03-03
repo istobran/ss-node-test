@@ -3,14 +3,13 @@
  * E-mail i@bangz.me
  * @author BangZ
  */
-
-const fs = require("fs");
-const path = require("path");
-const jsonfile = require("jsonfile");
-const tcpp = require('tcp-ping');
-const dns = require('dns');
-const Table = require('cli-table2');
-const Gauge = require("gauge");
+import fs from "fs";
+import path from "path";
+import jsonfile from "jsonfile";
+import tcpp from "tcp-ping";
+import dns from "dns";
+import Table from "cli-table2";
+import Gauge from "gauge";
 
 // 帮助信息
 const helpMessage = `

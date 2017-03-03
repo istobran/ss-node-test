@@ -17,9 +17,15 @@
     "url": "https://github.com/istobran/ss-node-test/issues"
   },
   "homepage": "https://github.com/istobran/ss-node-test#readme",
-  "presets": [
-    "env"
-  ],
+  "babel": {
+    "presets": [
+      ["env", {
+        "targets": {
+          "node": "current"
+        }
+      }]
+    ]
+  },
   "dependencies": {
     "cli-table2": "^0.2.0",
     "gauge": "^2.7.3",
