@@ -1,3 +1,5 @@
+import Gauge from "gauge";
+
 export default class {
   /**
    * 构造方法，用于初始化进度条

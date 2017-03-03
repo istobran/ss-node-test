@@ -6,11 +6,7 @@
 import fs from "fs";
 import path from "path";
 import jsonfile from "jsonfile";
-import tcpp from "tcp-ping";
-import dns from "dns";
-import Table from "cli-table2";
-import Gauge from "gauge";
-import Task from "../task";
+import Task from "./task.js";
 
 class Main {
   /**
@@ -38,6 +34,7 @@ class Main {
       throw new Error(`'${file_path}' no such file or directory!`);
     }
   }
+
   /**
    * 执行入口
    */
@@ -47,4 +44,4 @@ class Main {
 }
 
 // 运行主程序
-new Main();
+new Main().execute();

@@ -1,3 +1,7 @@
+import tcpp from "tcp-ping";
+import dns from "dns";
+import Table from "cli-table2";
+
 export default class {
   /**
    * 构造方法，用于初始化私有变量
@@ -9,7 +13,7 @@ export default class {
     this.pureData = new Array();
     this.out = new Table({
       head: ['Hostname', 'Resolve', 'Port', 'Delay'],
-      colWidths: [20, 20, 15]
+      colWidths: [20, 20, 10, 15]
     });
     this.curr_index = 1;
     this.curr_target = "";
@@ -20,7 +24,7 @@ export default class {
    * @param {String} ip 要判断的IP地址
    * @return {Boolean}
    */
-  isIPv4(ip) => {
+  isIPv4(ip) {
     return /^(?=\d+\.\d+\.\d+\.\d+$)(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.?){4}$/.test(ip);
   }
 
@@ -29,9 +33,9 @@ export default class {
    * @param {Object} item 服务器对象
    * @return {Promise}
    */
-  const resolveIP = (item) => {
+  resolveIP(item) {
     return new Promise((resolve, reject) => {
-      if (isIPv4(item.server)) {
+      if (this.isIPv4(item.server)) {
         item.ip = item.server;
         resolve();
       } else {
@@ -53,17 +57,17 @@ export default class {
    * @param {Object} item 服务器对象
    * @return {Promise}
    */
-  const ping = (item) => {
+  ping(item) {
     return new Promise((resolve, reject) => {
-      curr_target = item.server;
-      resolveIP(item).then(() => {
+      this.curr_target = item.server;
+      this.resolveIP(item).then(() => {
         if (item.ip == "无法解析") {      // 解析失败
-          out.push([item.server, "无法解析", item.server_port, "无法连接"]);
+          this.out.push([item.server, "无法解析", item.server_port, "无法连接"]);
           resolve();
         } else {    // 解析成功
           tcpp.ping({ address: item.ip, port: item.server_port, timeout: 500, attempts: 1 }, (err, data) => {
-            out.push([item.server, item.ip, item.server_port, data.avg ? data.avg.toFixed(3) : "无法连接"]);
-            pureData.push({
+            this.out.push([item.server, item.ip, item.server_port, data.avg ? data.avg.toFixed(3) : "无法连接"]);
+            this.pureData.push({
               hostname: item.server,
               ipaddr: item.ip,
               port: item.server_port,
@@ -81,12 +85,12 @@ export default class {
    * @param {Array} data 服务器延迟列表
    * @return {Object}
    */
-  const min = (data) => {
+  min(data) {
     var min = null;
     data.forEach((item, index) => {
       if (index === 0) {
         min = item;
-      } else if (item.delay < min.delay) {
+      } else if (Number.parseFloat(item.delay) < Number.parseFloat(min.delay)) {
         min = item;
       }
     });
@@ -99,21 +103,19 @@ export default class {
   run() {
     // 返回promise对象的函数的数组
     var tasks = [];
-    nodeList.forEach((item) => {
-      tasks.push(() => { return ping(item).then(() => {curr_index++}) });
+    this.nodeList.forEach(item => {
+      tasks.push(() => { return this.ping(item).then(() => {this.curr_index++}) });
     });
     var promise = Promise.resolve();
     // 开始的地方
     tasks.forEach(fn => {
       promise = promise.then(fn);
     });
-    gt.show();
-    return promise;
-    main().then(function (value) {
-      console.log(out.toString());
-      const fastest = min(pureData);
-      console.log(`统计：共计 ${nodeList.length} 个节点，其中最快节点的是 ${fastest.hostname}(${fastest.delay})`);
-    }).catch(function(error){
+    promise.then((value) => {
+      console.log(this.out.toString());
+      const fastest = this.min(this.pureData);
+      console.log(`统计：共计 ${this.nodeList.length} 个节点，其中最快节点的是 ${fastest.hostname}(${fastest.delay})`);
+    }).catch((error) => {
       console.error(error);
     });
   }

@@ -19,11 +19,14 @@
   "homepage": "https://github.com/istobran/ss-node-test#readme",
   "babel": {
     "presets": [
-      ["env", {
-        "targets": {
-          "node": "current"
+      [
+        "env",
+        {
+          "targets": {
+            "node": "current"
+          }
         }
-      }]
+      ]
     ]
   },
   "dependencies": {
