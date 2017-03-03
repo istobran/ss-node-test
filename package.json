@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./index.js ./gui-config.json"
+    "start": "babel-node ./index.js ./gui-config.json"
   },
   "repository": {
     "type": "git",
@@ -17,10 +17,18 @@
     "url": "https://github.com/istobran/ss-node-test/issues"
   },
   "homepage": "https://github.com/istobran/ss-node-test#readme",
+  "presets": [
+    "env"
+  ],
   "dependencies": {
     "cli-table2": "^0.2.0",
     "gauge": "^2.7.3",
     "jsonfile": "^2.4.0",
     "tcp-ping": "^0.1.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.23.0",
+    "babel-core": "^6.23.1",
+    "babel-preset-env": "^1.1.11"
   }
 }
