@@ -7,6 +7,7 @@ import fs from "fs";
 import path from "path";
 import jsonfile from "jsonfile";
 import Task from "./task.js";
+import Progress from "./progress.js";
 
 class Main {
   /**
@@ -39,7 +40,9 @@ class Main {
    * 执行入口
    */
   execute() {
-    new Task(this.config_data).run();
+    this.progress = new Progress();
+    this.task = new Task(this.config_data);
+    this.task.run();
   }
 }
 

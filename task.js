@@ -15,8 +15,6 @@ export default class {
       head: ['Hostname', 'Resolve', 'Port', 'Delay'],
       colWidths: [20, 20, 10, 15]
     });
-    this.curr_index = 1;
-    this.curr_target = "";
   }
 
   /**
@@ -95,6 +93,24 @@ export default class {
       }
     });
     return min;
+  }
+
+  /**
+   * 注册进度条组件
+   * @param {Progress} pgbar 进度条组件
+   */
+  register(pgbar) {
+    this.pgbar = pgbar;
+  }
+
+  /**
+   * 更新进度
+   * @param {Progress} pgbar 进度条组件
+   */
+  updateProgress() {
+    if (this.pgbar) {
+      this.pgbar.update();
+    }
   }
 
   /**
