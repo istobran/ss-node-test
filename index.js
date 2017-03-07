@@ -42,6 +42,7 @@ class Main {
   execute() {
     this.progress = new Progress();
     this.task = new Task(this.config_data);
+    this.task.register(this.progress);
     this.task.run();
   }
 }

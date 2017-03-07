@@ -5,8 +5,9 @@ export default class {
    * 构造方法，用于初始化进度条
    */
   constructor() {
-    this.curr_index = 1;
-    this.curr_target = "";
+    this.curr_index = 0;
+    this.taskName = "";
+    this.fullLength = 1;
 
     // 进度条部分
     this.gt = new Gauge(process.stderr, {    // 进度条对象
@@ -15,15 +16,15 @@ export default class {
     });
     this.progress = 0;   // 进度
     this.pulse = setInterval(function () {   // 说明信息更新器
-      this.gt.pulse(`正在测试服务器 ${this.curr_target} 的延迟 ${this.curr_index}/${nodeList.length}`)
+      this.gt.pulse(`正在测试服务器 ${this.taskName} 的延迟 ${this.curr_index}/${this.fullLength}`)
     }, 110);
     this.prog = setInterval(function () {    // 进度条更新器
-      progress = curr_index / nodeList.length;
-      this.gt.show(Math.round(progress * 100)+"%", progress)
-      if (progress >= 1) {
-        clearInterval(prog)
-        clearInterval(pulse)
-        gt.disable()
+      this.progress = this.curr_index / this.fullLength;
+      this.gt.show(Math.round(this.progress * 100)+"%", this.progress)
+      if (this.progress >= 1) {
+        clearInterval(this.prog)
+        clearInterval(this.pulse)
+        this.gt.disable()
       }
     }, 100);
   }
@@ -37,8 +38,18 @@ export default class {
 
   /**
    * 更新进度
+   * @param {String} taskName 当前任务名
    */
-  update() {
+  update(taskName) {
+    this.taskName = taskName;
+    this.curr_index++;
+  }
 
+  /**
+   * 设置总任务量
+   * @param {Number} length 总任务数
+   */
+  setFullLength(length) {
+    this.fullLength = length;
   }
 }

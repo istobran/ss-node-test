@@ -57,7 +57,7 @@ export default class {
    */
   ping(item) {
     return new Promise((resolve, reject) => {
-      this.curr_target = item.server;
+      this.updateProgress(item.server);
       this.resolveIP(item).then(() => {
         if (item.ip == "无法解析") {      // 解析失败
           this.out.push([item.server, "无法解析", item.server_port, "无法连接"]);
@@ -101,15 +101,16 @@ export default class {
    */
   register(pgbar) {
     this.pgbar = pgbar;
+    this.pgbar.setFullLength(this.nodeList.length);
   }
 
   /**
    * 更新进度
-   * @param {Progress} pgbar 进度条组件
+   * @param {String} taskName 当前执行的任务名
    */
-  updateProgress() {
+  updateProgress(taskName) {
     if (this.pgbar) {
-      this.pgbar.update();
+      this.pgbar.update(taskName);
     }
   }
 
@@ -120,7 +121,7 @@ export default class {
     // 返回promise对象的函数的数组
     var tasks = [];
     this.nodeList.forEach(item => {
-      tasks.push(() => { return this.ping(item).then(() => {this.curr_index++}) });
+      tasks.push(() => { return this.ping(item) });
     });
     var promise = Promise.resolve();
     // 开始的地方
