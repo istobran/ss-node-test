@@ -19,11 +19,14 @@
   "homepage": "https://github.com/istobran/ss-node-test#readme",
   "babel": {
     "presets": [
-      ["env", {
-        "targets": {
-          "node": "current"
+      [
+        "env",
+        {
+          "targets": {
+            "node": "current"
+          }
         }
-      }]
+      ]
     ]
   },
   "dependencies": {
@@ -35,6 +38,7 @@
   "devDependencies": {
     "babel-cli": "^6.23.0",
     "babel-core": "^6.23.1",
-    "babel-preset-env": "^1.1.11"
+    "babel-preset-env": "^1.1.11",
+    "dot": "^1.1.1"
   }
 }
