@@ -15,10 +15,10 @@ export default class {
       cleanupOnExit: true
     });
     this.progress = 0;   // 进度
-    this.pulse = setInterval(function () {   // 说明信息更新器
+    this.pulse = setInterval(() => {   // 说明信息更新器
       this.gt.pulse(`正在测试服务器 ${this.taskName} 的延迟 ${this.curr_index}/${this.fullLength}`)
     }, 110);
-    this.prog = setInterval(function () {    // 进度条更新器
+    this.prog = setInterval(() => {    // 进度条更新器
       this.progress = this.curr_index / this.fullLength;
       this.gt.show(Math.round(this.progress * 100)+"%", this.progress)
       if (this.progress >= 1) {
