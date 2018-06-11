@@ -118,22 +118,12 @@ export default class {
    * 执行测试任务
    */
   run() {
-    // 返回promise对象的函数的数组
-    var tasks = [];
-    this.nodeList.forEach(item => {
-      tasks.push(() => { return this.ping(item) });
-    });
-    var promise = Promise.resolve();
-    // 开始的地方
-    tasks.forEach(fn => {
-      promise = promise.then(fn);
-    });
-    promise.then((value) => {
-      console.log(this.out.toString());
-      const fastest = this.min(this.pureData);
-      console.log(`统计：共计 ${this.nodeList.length} 个节点，其中最快节点的是 ${fastest.hostname}(${fastest.delay})`);
-    }).catch((error) => {
-      console.error(error);
-    });
+    this.nodeList.map(item => this.ping.bind(this, item))     // 构造函数列表
+        .reduce((prev, next) => prev.then(next), Promise.resolve())   // 构造promise链
+        .then(_ => {    // 最终输出
+          console.log(this.out.toString());
+          const fastest = this.min(this.pureData);
+          console.log(`统计：共计 ${this.nodeList.length} 个节点，其中最快节点的是 ${fastest.hostname}(${fastest.delay})`);
+        }).catch(console.error);    // 异常打印
   }
 }
